@@ -1,7 +1,8 @@
 {
-  "name": "drtrips-hotel-mcp",
+  "name": "@drtrips-comp/hotel-mcp-server",
   "version": "1.0.0",
   "description": "MCP server for Booking.com hotel search integration by DrTrips",
+  "mcpName": "@drtrips-comp/hotel-mcp-server",
   "keywords": [
     "mcp",
     "booking",
@@ -16,7 +17,7 @@
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "drtrips-hotel-mcp": "dist/index.js"
+    "hotel-mcp-server": "dist/index.js"
   },
   "files": [
     "dist"
