@@ -1,0 +1,45 @@
+{
+  "name": "drtrips-hotel-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for Booking.com hotel search integration by DrTrips",
+  "keywords": [
+    "mcp",
+    "booking",
+    "hotel",
+    "travel",
+    "modelcontextprotocol",
+    "drtrips"
+  ],
+  "homepage": "https://modelcontextprotocol.io",
+  "license": "MIT",
+  "author": "DrTrips",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "drtrips-hotel-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc && shx chmod +x dist/*.js",
+    "prepare": "npm run build",
+    "watch": "tsc --watch",
+    "dev": "tsx src/index.ts",
+    "test": "node dist/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.1",
+    "axios": "^1.6.2",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "shx": "^0.3.4",
+    "tsx": "^4.7.0",
+    "typescript": "^5.6.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
