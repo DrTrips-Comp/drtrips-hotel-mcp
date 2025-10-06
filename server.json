@@ -1,62 +1,45 @@
 {
-  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
-  "name": "@drtrips-comp/hotel-mcp-server",
-  "description": "MCP server for Booking.com hotel search with pricing, photos, reviews, and booking links",
+  "$schema": "https://modelcontextprotocol.io/schema/server.json",
+  "namespace": "io.github.drtrips-comp/drtrips-hotel-mcp",
+  "name": "DrTrips Hotel MCP Server",
+  "description": "MCP server for searching hotels on Booking.com with detailed information including pricing, photos, facilities, and reviews",
   "version": "1.0.0",
-  "repository": {
-    "source": "github",
-    "url": "https://github.com/DrTrips-Comp/drtrips-hotel-mcp"
+  "license": "MIT",
+  "author": {
+    "name": "DrTrips"
   },
-  "packages": [
-    {
-      "registry_type": "npm",
-      "identifier": "@drtrips-comp/hotel-mcp-server",
-      "version": "1.0.0",
-      "transport": {
-        "type": "stdio"
-      },
-      "environment_variables": [
-        {
-          "name": "RAPID_API_KEY",
-          "value": "{rapid_api_key}",
-          "variables": {
-            "rapid_api_key": {
-              "description": "Your RapidAPI key for Booking.com API",
-              "is_required": true
-            }
-          }
-        },
-        {
-          "name": "OPENWEATHER_API_KEY",
-          "value": "{openweather_api_key}",
-          "variables": {
-            "openweather_api_key": {
-              "description": "Your OpenWeather API key (optional)",
-              "is_required": false
-            }
-          }
-        },
-        {
-          "name": "GOOGLE_MAPS_API_KEY",
-          "value": "{google_maps_api_key}",
-          "variables": {
-            "google_maps_api_key": {
-              "description": "Your Google Maps API key (optional)",
-              "is_required": false
-            }
-          }
-        },
-        {
-          "name": "PERPLEXITY_API_KEY",
-          "value": "{perplexity_api_key}",
-          "variables": {
-            "perplexity_api_key": {
-              "description": "Your Perplexity API key (optional)",
-              "is_required": false
-            }
-          }
-        }
-      ]
+  "homepage": "https://github.com/DrTrips-Comp/drtrips-hotel-mcp",
+  "sourceUrl": "https://github.com/DrTrips-Comp/drtrips-hotel-mcp",
+  "vendor": {
+    "name": "DrTrips",
+    "url": "https://github.com/DrTrips-Comp"
+  },
+  "deployment": {
+    "type": "package",
+    "package": {
+      "type": "npm",
+      "name": "drtrips-hotel-mcp",
+      "registry": "https://registry.npmjs.org"
     }
-  ]
+  },
+  "categories": [
+    "travel",
+    "search",
+    "booking"
+  ],
+  "tags": [
+    "hotel",
+    "booking",
+    "travel",
+    "search",
+    "booking.com"
+  ],
+  "config": {
+    "required": {
+      "RAPID_API_KEY": {
+        "type": "string",
+        "description": "RapidAPI key for Booking.com API access"
+      }
+    }
+  }
 }
