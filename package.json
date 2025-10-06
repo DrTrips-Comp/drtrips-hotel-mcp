@@ -1,8 +1,8 @@
 {
-  "name": "@drtrips-comp/hotel-mcp-server",
+  "name": "drtrips-hotel-mcp",
   "version": "1.0.0",
   "description": "MCP server for Booking.com hotel search integration by DrTrips",
-  "mcpName": "@drtrips-comp/hotel-mcp-server",
+  "mcpName": "drtrips-hotel-mcp",
   "keywords": [
     "mcp",
     "booking",
@@ -14,10 +14,14 @@
   "homepage": "https://modelcontextprotocol.io",
   "license": "MIT",
   "author": "DrTrips",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DrTrips-Comp/drtrips-hotel-mcp.git"
+  },
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "hotel-mcp-server": "dist/index.js"
+    "drtrips-hotel-mcp": "dist/index.js"
   },
   "files": [
     "dist"
