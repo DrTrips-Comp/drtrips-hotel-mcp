@@ -18,27 +18,6 @@ An MCP (Model Context Protocol) server implementation that integrates with the B
 - Node.js v18 or higher
 - Booking.com API key from [RapidAPI](https://rapidapi.com/DataCrawler/api/booking-com15)
 
-### NPX Usage (Recommended)
-
-You can run this MCP server directly using npx:
-
-```bash
-npx drtrips-hotel-mcp
-```
-
-### Local Installation
-
-```bash
-# Clone the repository
-git clone <your-repo-url>
-cd hotel_mcp
-
-# Install dependencies
-npm install
-
-# Build the project
-npm run build
-```
 
 ## Configuration
 
@@ -50,34 +29,12 @@ Create a `.env` file in the root directory:
 # Required
 RAPID_API_KEY=your_rapid_api_key_here
 
-# Optional (for future features)
-OPENWEATHER_API_KEY=your_openweather_api_key
-GOOGLE_MAPS_API_KEY=your_google_maps_api_key
-PERPLEXITY_API_KEY=your_perplexity_api_key
 ```
 
 ### Claude Desktop Configuration
 
-Add to your Claude Desktop configuration file:
+Add the server to your Claude Desktop configuration file using `npx`:
 
-**Using Local Build (Current - Not Published Yet):**
-```json
-{
-  "mcpServers": {
-    "hotel-search": {
-      "command": "node",
-      "args": ["D:/lanflow-reccomendation/app/mcp/hotel_mcp/dist/index.js"],
-      "env": {
-        "RAPID_API_KEY": "your_api_key_here"
-      }
-    }
-  }
-}
-```
-
-⚠️ Replace the path with your actual project path.
-
-**Using NPX (After Publishing to NPM):**
 ```json
 {
   "mcpServers": {
@@ -91,12 +48,6 @@ Add to your Claude Desktop configuration file:
   }
 }
 ```
-
-This works only **after** you publish to npm with `npm publish`.
-
-**Configuration file location:**
-- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
 
 ## Usage
 
@@ -127,81 +78,104 @@ Search for family hotels in Tokyo for 2 adults and 2 children (ages 8 and 10)
 from Jan 10-15, 2025, show me 3 options
 ```
 
-## Development
+### Return Format
 
-### Build
+The `search_hotels` tool returns an array of hotel objects in JSON format. Each hotel object contains:
 
-```bash
-npm run build
+```json
+[
+  {
+    "name": "Hotel Name",
+    "hotel_id": "12345678",
+    "accommodation_type": "Hotel",
+    "location": {
+      "address": "123 Main Street",
+      "city": "Paris",
+      "country": "France",
+      "latitude": 48.8566,
+      "longitude": 2.3522
+    },
+    "photos": [
+      "https://example.com/photo1.jpg",
+      "https://example.com/photo2.jpg"
+    ],
+    "rooms": [
+      {
+        "name": "Deluxe Double Room",
+        "price": 500,
+        "price_per_night": 100,
+        "currency": "USD",
+        "total_days": 5,
+        "photos": ["https://example.com/room1.jpg"],
+        "facilities": ["WiFi", "Air conditioning"],
+        "highlights": ["City view", "Balcony"]
+      }
+    ],
+    "facilities": [
+      "Free WiFi",
+      "Restaurant",
+      "Bar",
+      "24-hour front desk",
+      "Fitness center"
+    ],
+    "checkin_checkout": {
+      "checkin": {
+        "from": "14:00",
+        "until": "23:00"
+      },
+      "checkout": {
+        "from": "07:00",
+        "until": "11:00"
+      }
+    },
+    "featured_review": [
+      {
+        "author": "John D.",
+        "content": "Excellent location and friendly staff!",
+        "rating": 9.5,
+        "date": "2024-11-15"
+      }
+    ],
+    "rating_scores": [
+      {
+        "reviews_category": "Overall",
+        "reviewsCount": 1234,
+        "score": 8.9,
+        "category": "overall"
+      },
+      {
+        "reviews_category": "Location",
+        "reviewsCount": 1234,
+        "score": 9.5,
+        "category": "location"
+      }
+    ],
+    "review_count": 1234,
+    "url": "https://www.booking.com/hotel/...",
+    "url_booking_hotel": "https://www.booking.com/hotel/..."
+  }
+]
 ```
 
-### Watch Mode
-
-```bash
-npm run watch
-```
-
-### Development Mode (with tsx)
-
-```bash
-npm run dev
-```
-
-## Architecture
-
-### Project Structure
-
-```
-hotel_mcp/
-├── src/
-│   ├── config/
-│   │   └── settings.ts          # API configuration
-│   ├── models/
-│   │   └── hotel-models.ts      # TypeScript interfaces
-│   ├── services/
-│   │   └── hotel-api.ts         # Booking.com API client
-│   └── index.ts                 # MCP server entry point
-├── dist/                        # Compiled JavaScript
-├── package.json
-├── tsconfig.json
-└── .env                         # Environment variables
-```
-
-### Key Components
-
-- **HotelSearchAPI**: Main API client handling all Booking.com interactions
-  - Two-phase search pattern: destination → hotels → details
-  - Concurrent fetching with Promise.allSettled()
-  - Photo fallback logic from multiple sources
-
-- **MCP Server**: Exposes hotel search as MCP tool
-  - Stdio transport for Claude Desktop integration
-  - Formatted output with emojis for readability
-  - Comprehensive error handling
+**Key Fields:**
+- `name`: Hotel name
+- `hotel_id`: Unique hotel identifier
+- `accommodation_type`: Type of property (Hotel, Apartment, Resort, etc.)
+- `location`: Complete address with coordinates
+- `photos`: Array of hotel photo URLs
+- `rooms`: Available room options with pricing and details
+- `facilities`: List of hotel amenities
+- `checkin_checkout`: Check-in and check-out time windows
+- `featured_review`: Highlighted guest reviews
+- `rating_scores`: Category-specific ratings (overall, location, cleanliness, etc.)
+- `review_count`: Total number of reviews
+- `url_booking_hotel`: Direct booking link with pre-filled search parameters
 
 ## API Limits
 
 - **Free Tier**: Limited requests per month on RapidAPI
 - **Rate Limiting**: Implemented internally to prevent quota exhaustion
 - **Concurrent Requests**: Maximum 10 hotels processed in parallel
-
-## Documentation
-
-Complete documentation is available in the [`/docs`](docs/) directory:
-
-### 📚 User Guides
-- **[Quick Start](docs/guides/QUICKSTART.md)** - Get started in 3 steps
-- **[Usage Guide](docs/guides/USAGE.md)** - Detailed usage instructions
-- **[Publishing to NPM](docs/guides/PUBLISHING.md)** - How to publish the package
-
-### 🔧 Technical Reference
-- **[API Request Flow](docs/reference/API_REQUEST_FLOW.md)** - Request patterns and optimization
-- **[Metadata Tracking](docs/reference/METADATA_TRACKING.md)** - Request counter implementation
-- **[Migration Summary](docs/reference/MIGRATION_COMPLETE.md)** - Python to TypeScript migration
-
-### 🚀 For Developers
-- **[Migration Guide](docs/MIGRATION_GUIDE_PYTHON_TO_TYPESCRIPT.md)** - Complete Python to TypeScript guide
-- **[MCP SDK Documentation](docs/mcp_documentation.md)** - TypeScript MCP SDK reference
 
 ## Troubleshooting
 
@@ -217,44 +191,9 @@ Complete documentation is available in the [`/docs`](docs/) directory:
 2. Check date format (must be YYYY-MM-DD)
 3. Ensure destination name is spelled correctly
 
-### Claude Desktop Not Detecting Server
-
-1. Restart Claude Desktop after config changes
-2. Check config file syntax (valid JSON)
-3. Verify file paths in configuration
-4. Check Claude Desktop logs for errors
-
-## Project Structure
-
-```
-drtrips-hotel-mcp/
-├── src/                    # TypeScript source code
-│   ├── config/            # Configuration
-│   ├── models/            # Type definitions
-│   ├── services/          # API client
-│   └── index.ts           # MCP server entry point
-├── dist/                  # Compiled JavaScript (auto-generated)
-├── docs/                  # Documentation
-│   ├── guides/           # User guides
-│   ├── reference/        # Technical docs
-│   └── examples-archive/ # Reference implementations
-├── .env                   # Environment variables (create from .env.example)
-├── package.json          # NPM package config
-└── README.md             # This file
-```
-
-**Note:** This project was migrated from Python to TypeScript. All Python source files have been removed. See [Migration Summary](docs/reference/MIGRATION_COMPLETE.md) for details.
-
 ## License
 
 MIT License - see LICENSE file for details
-
-## Support
-
-For issues and questions:
-- Check the [troubleshooting guide](#troubleshooting)
-- Review [MCP documentation](https://modelcontextprotocol.io)
-- File an issue on GitHub
 
 ## Credits
 
