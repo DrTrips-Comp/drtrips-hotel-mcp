@@ -1,45 +1,27 @@
 {
-  "$schema": "https://modelcontextprotocol.io/schema/server.json",
-  "namespace": "io.github.drtrips-comp/drtrips-hotel-mcp",
-  "name": "DrTrips Hotel MCP Server",
-  "description": "MCP server for searching hotels on Booking.com with detailed information including pricing, photos, facilities, and reviews",
-  "version": "1.0.0",
-  "license": "MIT",
-  "author": {
-    "name": "DrTrips"
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-16/server.schema.json",
+  "name": "io.github.drtrips-comp/drtrips-hotel-mcp",
+  "description": "Search hotels on Booking.com with pricing, photos, facilities, and reviews via MCP",
+  "version": "1.0.1",
+  "status": "active",
+  "repository": {
+    "url": "https://github.com/DrTrips-Comp/drtrips-hotel-mcp",
+    "source": "github",
+    "id": "DrTrips-Comp/drtrips-hotel-mcp"
   },
-  "homepage": "https://github.com/DrTrips-Comp/drtrips-hotel-mcp",
-  "sourceUrl": "https://github.com/DrTrips-Comp/drtrips-hotel-mcp",
-  "vendor": {
-    "name": "DrTrips",
-    "url": "https://github.com/DrTrips-Comp"
+  "websiteUrl": "https://github.com/DrTrips-Comp/drtrips-hotel-mcp",
+  "registryType": "npm",
+  "identifier": "drtrips-hotel-mcp",
+  "transport": {
+    "type": "stdio"
   },
-  "deployment": {
-    "type": "package",
-    "package": {
-      "type": "npm",
-      "name": "drtrips-hotel-mcp",
-      "registry": "https://registry.npmjs.org"
+  "runtimeHint": "npx",
+  "runtimeArguments": ["-y"],
+  "environmentVariables": [
+    {
+      "name": "RAPID_API_KEY",
+      "description": "RapidAPI key for Booking.com API access",
+      "required": true
     }
-  },
-  "categories": [
-    "travel",
-    "search",
-    "booking"
-  ],
-  "tags": [
-    "hotel",
-    "booking",
-    "travel",
-    "search",
-    "booking.com"
-  ],
-  "config": {
-    "required": {
-      "RAPID_API_KEY": {
-        "type": "string",
-        "description": "RapidAPI key for Booking.com API access"
-      }
-    }
-  }
+  ]
 }

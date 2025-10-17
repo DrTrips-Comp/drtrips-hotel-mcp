@@ -93,12 +93,27 @@ export class HotelSearchAPI {
       if (response.status === 200 && response.data?.status && response.data?.data) {
         return { destinations: response.data.data };
       }
-      return { error: 'No destinations found' };
+      return {
+        error: `No destinations found for "${query}". Please try a different city name or check the spelling. Common destinations include: Paris, Tokyo, New York, London, Barcelona.`
+      };
     } catch (error) {
-      const errorMessage = axios.isAxiosError(error)
-        ? `API request failed with status ${error.response?.status}`
-        : String(error);
-      return { error: errorMessage };
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+        if (status === 401 || status === 403) {
+          return {
+            error: `API authentication failed (status ${status}). Please check that your RAPID_API_KEY is valid and has remaining quota. Visit https://rapidapi.com to manage your API key.`
+          };
+        } else if (status === 429) {
+          return {
+            error: `API rate limit exceeded (status ${status}). Please wait a moment and try again, or upgrade your RapidAPI plan for higher limits.`
+          };
+        } else {
+          return {
+            error: `API request failed with status ${status}. Please try again in a moment. If the issue persists, check the RapidAPI service status.`
+          };
+        }
+      }
+      return { error: String(error) };
     }
   }
 
@@ -152,12 +167,27 @@ export class HotelSearchAPI {
           .filter((id: any) => id !== undefined && id !== null);
         return { hotel_ids: hotelIds };
       }
-      return { error: 'No hotels found' };
+      return {
+        error: `No hotels available for the specified dates (${checkInDate} to ${checkOutDate}) with ${numAdults} adult(s) and ${rooms} room(s). Try adjusting your search criteria: different dates, fewer rooms, or a nearby destination.`
+      };
     } catch (error) {
-      const errorMessage = axios.isAxiosError(error)
-        ? `API request failed with status ${error.response?.status}`
-        : String(error);
-      return { error: errorMessage };
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+        if (status === 401 || status === 403) {
+          return {
+            error: `API authentication failed (status ${status}). Please check that your RAPID_API_KEY is valid and has remaining quota.`
+          };
+        } else if (status === 429) {
+          return {
+            error: `API rate limit exceeded (status ${status}). Please wait a moment and try again.`
+          };
+        } else {
+          return {
+            error: `Hotel search API request failed with status ${status}. Please try again in a moment.`
+          };
+        }
+      }
+      return { error: String(error) };
     }
   }
 
@@ -626,7 +656,9 @@ export class HotelSearchAPI {
       }
 
       // Phase 3: Get detailed hotel information
-      const MAX_HOTELS_TO_PROCESS = Math.min(10, hotelIds.length);
+      // Fetch max_results + buffer in case some hotels fail to return valid data
+      const bufferSize = 2;
+      const MAX_HOTELS_TO_PROCESS = Math.min(maxResults + bufferSize, hotelIds.length);
       const hotelIdsToProcess = hotelIds.slice(0, MAX_HOTELS_TO_PROCESS);
 
       // Fetch hotel details concurrently

@@ -23,26 +23,31 @@ if (!BOOKING_API_KEY) {
 const HOTEL_SEARCH_TOOL: Tool = {
   name: 'search_hotels',
   description:
-    'Search for hotels on Booking.com with detailed information including pricing, photos, facilities, and reviews. ' +
-    'Accepts destination, check-in/check-out dates, number of guests, and returns comprehensive hotel data.',
+    'Search for hotels on Booking.com with comprehensive details including pricing, photos, facilities, reviews, and ratings. ' +
+    'Use this tool when users need hotel accommodations. Requires destination, check-in/out dates (YYYY-MM-DD), and number of adults. ' +
+    'Returns up to max_results hotels with complete booking information including direct Booking.com URLs. ' +
+    'Best for: Finding hotels in specific cities, comparing accommodations, checking availability and prices. ' +
+    'NOT for: Finding flights, car rentals, or non-hotel accommodations (use specialized tools for those).',
   inputSchema: {
     type: 'object',
     properties: {
       destination: {
         type: 'string',
-        description: 'Destination city or location (e.g., "Paris", "New York", "Tokyo")'
+        description: 'Destination city, region, or landmark name. Examples: "Paris", "Tokyo", "New York City", "Barcelona", "London", "Dubai". Can also be specific areas like "Manhattan" or "Paris 5th arrondissement".'
       },
       check_in_date: {
         type: 'string',
-        description: 'Check-in date in YYYY-MM-DD format'
+        description: 'Check-in date in YYYY-MM-DD format. Must be today or a future date. Examples: "2025-01-15", "2025-03-20". Ensure the date is valid and not in the past.',
+        pattern: '^\\d{4}-\\d{2}-\\d{2}$'
       },
       check_out_date: {
         type: 'string',
-        description: 'Check-out date in YYYY-MM-DD format'
+        description: 'Check-out date in YYYY-MM-DD format. Must be after check-in date. Examples: "2025-01-20", "2025-03-25". Minimum 1 night stay required.',
+        pattern: '^\\d{4}-\\d{2}-\\d{2}$'
       },
       adults: {
         type: 'number',
-        description: 'Number of adults (1-30)',
+        description: 'Number of adults (1-30). Examples: 1 for solo traveler, 2 for couple, 4 for family.',
         minimum: 1,
         maximum: 30
       },
@@ -50,32 +55,44 @@ const HOTEL_SEARCH_TOOL: Tool = {
         type: 'array',
         items: {
           type: 'number',
-          description: 'Age of child'
+          description: 'Age of child (0-17)'
         },
-        description: 'Array of children ages (optional)',
+        description: 'Array of children ages (optional). Examples: [8, 10] for two children aged 8 and 10, [5] for one 5-year-old child. Leave empty if no children.',
         default: []
       },
       rooms: {
         type: 'number',
-        description: 'Number of rooms (1-8)',
+        description: 'Number of rooms needed (1-8). Default is 1 room. Examples: 1 for a single room, 2 for two separate rooms.',
         minimum: 1,
         maximum: 8,
         default: 1
       },
       currency: {
         type: 'string',
-        description: 'Currency code (e.g., USD, EUR, GBP)',
+        description: 'Currency code for pricing (3-letter ISO code). Examples: "USD" for US Dollars, "EUR" for Euros, "GBP" for British Pounds, "JPY" for Japanese Yen. Default: "USD".',
         default: 'USD'
       },
       max_results: {
         type: 'number',
-        description: 'Maximum number of hotel results to return (1-10)',
+        description: 'Maximum number of hotel results to return (1-10). Use lower numbers (3-5) for quick comparisons, higher numbers (8-10) for comprehensive searches. Default: 3.',
         minimum: 1,
         maximum: 10,
         default: 3
+      },
+      format: {
+        type: 'string',
+        enum: ['json', 'markdown'],
+        description: 'Return format: "json" for structured data that can be parsed and analyzed (default), "markdown" for human-readable formatted text with emojis. Use "json" when you need to process or compare hotel data programmatically.',
+        default: 'json'
       }
     },
     required: ['destination', 'check_in_date', 'check_out_date', 'adults']
+  },
+  annotations: {
+    readOnlyHint: true,
+    destructiveHint: false,
+    idempotentHint: true,
+    openWorldHint: true
   }
 };
 
@@ -168,7 +185,7 @@ function formatHotelResults(hotels: any[]): string {
 const server = new Server(
   {
     name: 'drtrips-hotel-mcp',
-    version: '1.0.0'
+    version: '1.0.1'
   },
   {
     capabilities: {
@@ -200,17 +217,78 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
     if (name === 'search_hotels') {
       // Validate required arguments
-      if (typeof args.destination !== 'string') {
-        throw new Error('Invalid arguments: "destination" must be a string');
+      if (typeof args.destination !== 'string' || !args.destination.trim()) {
+        throw new Error(
+          'Invalid "destination" parameter: must be a non-empty string. ' +
+          'Please provide a city or location name (e.g., "Paris", "Tokyo", "New York"). ' +
+          'If searching for a specific area, include the region (e.g., "Manhattan, New York").'
+        );
       }
+
       if (typeof args.check_in_date !== 'string') {
-        throw new Error('Invalid arguments: "check_in_date" must be a string');
+        throw new Error(
+          'Invalid "check_in_date" parameter: must be a string in YYYY-MM-DD format. ' +
+          'Examples: "2025-01-15", "2025-03-20". Please provide a valid date.'
+        );
       }
+
       if (typeof args.check_out_date !== 'string') {
-        throw new Error('Invalid arguments: "check_out_date" must be a string');
+        throw new Error(
+          'Invalid "check_out_date" parameter: must be a string in YYYY-MM-DD format. ' +
+          'Examples: "2025-01-20", "2025-03-25". Please provide a valid date.'
+        );
       }
+
       if (typeof args.adults !== 'number') {
-        throw new Error('Invalid arguments: "adults" must be a number');
+        throw new Error(
+          'Invalid "adults" parameter: must be a number between 1 and 30. ' +
+          'Examples: 1 for solo traveler, 2 for couple, 4 for family.'
+        );
+      }
+
+      // Validate date formats and logic
+      const checkInDate = new Date(args.check_in_date as string);
+      const checkOutDate = new Date(args.check_out_date as string);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (isNaN(checkInDate.getTime())) {
+        throw new Error(
+          `Invalid "check_in_date": must be in YYYY-MM-DD format (e.g., "2025-01-15"). ` +
+          `The date "${args.check_in_date}" could not be parsed. Please use the format YYYY-MM-DD.`
+        );
+      }
+
+      if (checkInDate < today) {
+        throw new Error(
+          'Invalid "check_in_date": cannot be in the past. ' +
+          `Today is ${today.toISOString().split('T')[0]}. ` +
+          'Please provide a check-in date that is today or in the future.'
+        );
+      }
+
+      if (isNaN(checkOutDate.getTime())) {
+        throw new Error(
+          `Invalid "check_out_date": must be in YYYY-MM-DD format (e.g., "2025-01-20"). ` +
+          `The date "${args.check_out_date}" could not be parsed. Please use the format YYYY-MM-DD.`
+        );
+      }
+
+      if (checkOutDate <= checkInDate) {
+        throw new Error(
+          'Invalid "check_out_date": must be after check-in date. ' +
+          `Check-in: ${args.check_in_date}, Check-out: ${args.check_out_date}. ` +
+          'Please ensure at least 1 night stay between check-in and check-out dates.'
+        );
+      }
+
+      // Validate adults count
+      const adults = args.adults as number;
+      if (adults < 1 || adults > 30) {
+        throw new Error(
+          `Invalid "adults" parameter: must be between 1 and 30, got ${adults}. ` +
+          'Please provide a valid number of adults.'
+        );
       }
 
       // Prepare search parameters
@@ -231,16 +309,31 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       // Get request count
       const totalRequests = hotelAPI.getRequestCount();
 
-      // Format and return results
-      const formattedResults = formatHotelResults(hotels);
+      // Get format preference (default to json)
+      const format = (args.format as string | undefined) || 'json';
 
-      return {
-        content: [{ type: 'text', text: formattedResults }],
-        isError: false,
-        _meta: {
-          total_requests: totalRequests
-        }
-      };
+      // Return results in requested format
+      if (format === 'markdown') {
+        const formattedResults = formatHotelResults(hotels);
+        return {
+          content: [{ type: 'text', text: formattedResults }],
+          isError: false,
+          _meta: {
+            total_requests: totalRequests,
+            format: 'markdown'
+          }
+        };
+      } else {
+        // Return JSON format (default)
+        return {
+          content: [{ type: 'text', text: JSON.stringify(hotels, null, 2) }],
+          isError: false,
+          _meta: {
+            total_requests: totalRequests,
+            format: 'json'
+          }
+        };
+      }
     }
 
     // Unknown tool

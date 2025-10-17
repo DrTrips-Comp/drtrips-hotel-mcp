@@ -1,6 +1,6 @@
 {
   "name": "drtrips-hotel-mcp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "MCP server for Booking.com hotel search integration by DrTrips",
   "mcpName": "drtrips-hotel-mcp",
   "keywords": [

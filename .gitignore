@@ -39,10 +39,20 @@ __pycache__/
 coverage/
 .nyc_output/
 
+# Test Results & Output
+results/
+*.result.json
+*.output.json
+test-output/
+
 # Temporary files
 *.tmp
 .cache/
 
+# MCP Development
 .mcp.json
 CLAUDE.md
 .claude/
+
+# Local development files
+*.local.*

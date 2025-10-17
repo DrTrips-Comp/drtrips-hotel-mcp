@@ -1,0 +1,79 @@
+<!--
+  Hotel Search MCP Server Evaluation
+
+  IMPORTANT: Before using this evaluation, you must fill in the <answer> tags with actual values.
+
+  To populate answers:
+  1. Build the server: npm run build
+  2. Run the evaluation script: python .claude/skills/mcp-builder/scripts/evaluation.py
+  3. For each question, manually verify the answer by using the tool
+  4. Update the <answer> tags below with the correct values
+
+  All questions use read-only operations and are designed to test the agent's ability to:
+  - Use the search_hotels tool effectively
+  - Interpret JSON results correctly
+  - Extract specific information from complex hotel data
+  - Compare multiple hotels across different criteria
+-->
+
+<evaluation>
+  <!-- Question 1: Basic hotel search with rating extraction -->
+  <qa_pair>
+    <question>Search for hotels in Paris, France for 2 adults checking in on 2025-02-14 (Valentine's Day) and checking out on 2025-02-16. Request 5 results in JSON format. Among these results, which hotel has the highest overall rating score? Return only the exact hotel name as it appears in the results.</question>
+    <answer>REPLACE_WITH_ACTUAL_HOTEL_NAME</answer>
+  </qa_pair>
+
+  <!-- Question 2: Price comparison -->
+  <qa_pair>
+    <question>Search for hotels in Tokyo, Japan for 1 adult from 2025-03-01 to 2025-03-05 (4 nights). Request 5 results in USD currency. What is the total price in USD for the cheapest hotel option? Return only the numeric value without the currency symbol.</question>
+    <answer>REPLACE_WITH_ACTUAL_PRICE</answer>
+  </qa_pair>
+
+  <!-- Question 3: Family travel with children -->
+  <qa_pair>
+    <question>Search for family-friendly accommodations in Barcelona, Spain for 2 adults and 2 children (ages 8 and 10) from 2025-04-10 to 2025-04-13. Request 5 results. Which hotel has the most guest reviews? Return only the exact hotel name.</question>
+    <answer>REPLACE_WITH_ACTUAL_HOTEL_NAME</answer>
+  </qa_pair>
+
+  <!-- Question 4: Facility extraction -->
+  <qa_pair>
+    <question>Search for hotels in London, UK for 2 adults from 2025-05-20 to 2025-05-23. Request 3 results. Looking at the first hotel in the results, how many total facilities are listed? Return only the number.</question>
+    <answer>REPLACE_WITH_ACTUAL_NUMBER</answer>
+  </qa_pair>
+
+  <!-- Question 5: Multiple rooms -->
+  <qa_pair>
+    <question>Search for hotels in Dubai, UAE for 4 adults needing 2 rooms from 2025-06-15 to 2025-06-18. Request 5 results in USD. What is the price per night (in USD) for the most expensive option? Return only the numeric value.</question>
+    <answer>REPLACE_WITH_ACTUAL_PRICE</answer>
+  </qa_pair>
+
+  <!-- Question 6: Review count comparison -->
+  <qa_pair>
+    <question>Search for hotels in New York City, USA for 2 adults from 2025-07-04 to 2025-07-07 (July 4th weekend). Request 5 results. What is the total number of reviews across all 5 hotels combined? Return only the sum as a number.</question>
+    <answer>REPLACE_WITH_ACTUAL_NUMBER</answer>
+  </qa_pair>
+
+  <!-- Question 7: Accommodation type -->
+  <qa_pair>
+    <question>Search for accommodations in Rome, Italy for 2 adults from 2025-08-10 to 2025-08-14. Request 5 results. How many of the returned results are classified as "Hotel" (versus other accommodation types like Apartment, B&amp;B, etc.)? Return only the count.</question>
+    <answer>REPLACE_WITH_ACTUAL_NUMBER</answer>
+  </qa_pair>
+
+  <!-- Question 8: Currency conversion -->
+  <qa_pair>
+    <question>Search for hotels in Singapore for 2 adults from 2025-09-01 to 2025-09-04. Request 3 results in EUR currency. What is the total price in EUR for the second hotel in the results? Return only the numeric value.</question>
+    <answer>REPLACE_WITH_ACTUAL_PRICE</answer>
+  </qa_pair>
+
+  <!-- Question 9: Solo traveler budget -->
+  <qa_pair>
+    <question>Search for hotels in Bangkok, Thailand for 1 adult (solo traveler) from 2025-10-15 to 2025-10-20 (5 nights). Request 5 results in USD. Among the results, what is the average price per night across all hotels? Calculate the average and return only the numeric value rounded to 2 decimal places.</question>
+    <answer>REPLACE_WITH_ACTUAL_AVERAGE</answer>
+  </qa_pair>
+
+  <!-- Question 10: Check-in time -->
+  <qa_pair>
+    <question>Search for hotels in Amsterdam, Netherlands for 2 adults from 2025-11-01 to 2025-11-03. Request 3 results. What is the earliest check-in time available among all the hotels returned? Return the time in HH:MM format (24-hour).</question>
+    <answer>REPLACE_WITH_ACTUAL_TIME</answer>
+  </qa_pair>
+</evaluation>
